@@ -1,0 +1,81 @@
+{% extends 'chat/base.html' %}
+{% load static %}
+
+{% block head_title %}
+Starting page
+{% endblock head_title %}
+
+{% block content %}
+<main>
+    <h2 class="chattitle">{{room_name}}</h2>
+    <div class="msgblock" id="msgblock">
+    </div>
+    <div>
+        <input class="msginput" id="input" type="text" size="80"> </br>
+        <input class="btn_chat" id="submit" type="button" value="SEND">
+    </div>
+    <div>
+        <h3 class="rename">You may change the chat's name here:</h3>
+        <input class="msginput" id="changename" type="text" size="80"> </br>
+        <button id="update_btn" class="btn_chat">UPDATE</button>
+    </div>
+    {{ room_name|json_script:"room-name" }}
+    {{ request.user.username|json_script:"user_username" }}
+    <script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const user_username = JSON.parse(document.getElementById('user_username').textContent);
+
+        document.querySelector('#submit').onclick = function (e) {
+            const messageInputDom = document.querySelector('#input');
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'username': user_username,
+            }));
+            messageInputDom.value = '';
+        };
+
+
+        const chatSocket = new WebSocket (
+            'ws://' +
+            window.location.host +
+            '/ws/chat/' +
+            roomName +
+            '/'
+        );
+
+        chatSocket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            document.querySelector('#msgblock').innerText += (data.username + ': ' + data.message + '\n')
+        }
+
+
+        const chatURL = 'http://127.0.0.1:8000/chat/api/chatlist/' + roomName + '/'
+        const upd_btn = document.getElementById("update_btn");
+        const element = document.querySelector(".chattitle");
+
+        async function updateChat(url, name) {
+                await fetch(url, {
+                    method: "PUT",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({name : name})
+                })
+                // код ниже в данном случае нужен потому, что вместо id чата используется поле name - из-за этого
+                // метод PUT, обновляя информацию, сохраняет и старую версию чата.
+                await fetch(url, {
+                    method: "DELETE",
+                })
+            };
+        
+        upd_btn.addEventListener('click', () => {
+            let value = document.getElementById("changename").value;
+            updateChat(chatURL, value);
+            console.log("Chat is updated with the name " + value)
+            value = ''
+        })
+        
+    </script>
+</main>
+{% endblock content %}

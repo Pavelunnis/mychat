@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+</head>
+<body>
+	<div class="container">
+        <form method="POST" action="">
+            {% csrf_token %}
+			{{form.as_p}}
+
+			<input class="btn login_btn" type="submit" value="Register Account">
+		</form>
+	</div>
+
+				{% for message in messages %}
+					<p id="messages">{{message}}</p>
+				{% endfor %}
+
+    <div>
+        Already have an account? <a href="{% url 'login' %}">Login</a>
+    </div>
+
+</body>
+</html>

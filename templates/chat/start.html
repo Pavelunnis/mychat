@@ -1,0 +1,19 @@
+{% extends 'chat/base.html' %}
+{% load static %}
+
+{% block head_title %}
+Starting page
+{% endblock head_title %}
+
+{% block content %}
+    <main>
+        <div class="direct_title">
+        <h1 class="direct_title_main"> CHATAPP </h1>
+        <h2>Choose your type of communication:</h2>
+        </div>
+        <div class="direct_container">
+        <a class="direct_btn" href="http://127.0.0.1:8000/private/">PRIVATE CHATS</a>
+        <a class="direct_btn" href="http://127.0.0.1:8000/chat/">PUBLIC CHATS</a>
+        </div>
+    </main>
+{% endblock content %}

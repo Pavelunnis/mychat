@@ -1,0 +1,58 @@
+{% extends 'chat/base.html' %}
+{% load static %}
+
+{% block head_title %}
+Starting page
+{% endblock head_title %}
+
+{% block content %}
+    <main>
+            <div class="userlist_container">
+                <button id="btn_users">SHOW ALL USERS</button>
+                <div id="userlist_container"> </div>
+            <button id="btn_toggle">Hide/show userlist</button></div>
+    </main>
+
+
+    <script>
+            const container = document.querySelector('#userlist_container');
+            const btn = document.querySelector('#btn_users');
+            const toggle = document.querySelector('#btn_toggle');
+
+            async function getMemberList(url) {
+               let response = await fetch(url,  {
+                    method: "GET",
+                    mode: "no-cors",
+                });
+               if (response.ok) {
+                   return await response.json()
+               } else {
+                    alert("Ошибка HTTP: " + response.status);
+               }
+            };
+
+            btn.addEventListener('click', async () => {
+                const reqResult = await getMemberList('http://127.0.0.1:8000/account/members/');
+                console.log('reqResult', reqResult);
+
+                reqResult.forEach(element => {
+                    let name = element.name
+                    let pic = element.profile_pic
+                    container.innerHTML += `<div class="user_info">
+                    <img class="profile-pic" src="${pic}" >
+                    <a class="username" href="http://127.0.0.1:8000/private/${name}">${name}</a>
+                    </div>`
+                    });
+
+                toggle.style.display = "block";
+            });
+
+            toggle.addEventListener('click', () => {
+                if (container.style.display === "none") {
+                    container.style.display = "block";
+                } else {
+                    container.style.display = "none";
+                }
+            })
+    </script>
+{% endblock content %}
